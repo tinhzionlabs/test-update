@@ -1,6 +1,6 @@
 {
   "name": "electron-app",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "My test electron app",
   "main": "main.js",
   "scripts": {
@@ -9,14 +9,14 @@
     "start": "electron .",
     "dist": "electron-builder"
   },
-  "repository": "https://github.com/cyrilgupta/electron-autoupdater",
+  "repository": "https://github.com/tinhzionlabs/test-update",
   "publish": {
     "provider": "github",
     "releaseType": "release"
   },
   "build": {
     "appId": "com.coderjeet.autoupdater",
-    "productName": "Autoupdater app",
+    "productName": "Autoupdater",
     "win": {
       "target": "nsis"
     },
