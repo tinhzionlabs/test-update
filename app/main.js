@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain, ipcRenderer } = require("electron");
+const { app, BrowserWindow, ipcMain, ipcRenderer, autoUpdater, dialog } = require("electron");
 const MainScreen = require("./screens/main/mainScreen");
 const Globals = require("./globals");
-const { autoUpdater, AppUpdater } = require("electron-updater");
+
 
 let curWindow;
 
@@ -20,30 +20,46 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length == 0) createWindow();
   });
 
-  autoUpdater.checkForUpdates();
+  const server = 'https://test-hz-six.vercel.app'
+  const url = `${server}/update/mac/${app.getVersion()}`
+
+  autoUpdater.setFeedURL({ url })
+  console.log(url)
+  setInterval(() => {
+    curWindow.showMessage(`checking hihihih. Current version ${app.getVersion()}`);
+    console.log("check update")
+    autoUpdater.checkForUpdates()
+  }, 20000)
+
+  console.log("check update")
+
   curWindow.showMessage(`Checking for updates. Current version ${app.getVersion()}`);
 });
 
 /*New Update Available*/
-autoUpdater.on("update-available", (info) => {
-  curWindow.showMessage(`Update available. Current version ${app.getVersion()}`);
-  let pth = autoUpdater.downloadUpdate();
-  curWindow.showMessage(pth);
-});
 
-autoUpdater.on("update-not-available", (info) => {
-  curWindow.showMessage(`No update available. Current version ${app.getVersion()}`);
-});
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  curWindow.showMessage(`download ok. Current version ${app.getVersion()}`);
 
-/*Download Completion Message*/
-autoUpdater.on("update-downloaded", (info) => {
-  curWindow.showMessage(`Update downloaded. Current version ${app.getVersion()}`);
-});
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: process.platform === 'win32' ? releaseNotes : releaseName,
+    detail:
+      'A new version has been downloaded. Restart the application to apply the updates.',
+  }
 
-autoUpdater.on("error", (info) => {
-  curWindow.showMessage(info);
-});
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    curWindow.showMessage(`error ${app.getVersion()}`);
+    if (returnValue.response === 0) autoUpdater.quitAndInstall()
+  })
+})
 
+autoUpdater.on('error', (message) => {
+  console.error('There was a problem updating the application')
+  curWindow.showMessage(`${message.toString()}. Current version ${app.getVersion()}`);
+})
 
 
 
